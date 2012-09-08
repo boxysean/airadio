@@ -1,4 +1,8 @@
 import getpass, os, imaplib, email
+import yaml
+import sys
+
+from optparse import OptionParser
 
 def getMsgs(servername="imap.gmail.com"):
   usernm = "interactivosradio"
@@ -20,11 +24,19 @@ def getAttachment(msg):
       return part.get_filename(), part.get_payload(decode=1)
 
 if __name__ == '__main__':
-  for msg in getMsgs():
+  parser = OptionParser()
+
+  parser.add_option("-f", "--first", dest="first_run", help="checks all emails in the account")
+
+  (options, args) = parser.parse_args()
+
+#  print options, args
+#  sys.exit(0)
+
+  for msg in getMsgs(options["account"]):
     filename, payload = getAttachment(msg)
 
     if not payload:
-      print "SHOULDN'T BE HERE"
       continue
 
     print "writing %s" % (filename)
