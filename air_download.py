@@ -17,10 +17,16 @@ def getMsgs(usernm, passwd=None, servername="imap.gmail.com", first=True):
   else:
     typ, data = conn.search(None,'UnSeen')
 
+  if data:
+    print "new message(s)!"
+
   for num in data[0].split():
+    hdata = conn.fetch(num, '(BODY[HEADER.FIELDS (SUBJECT FROM DATE)])')
+    header_data = hdata[1][0][1]
+    print header_data
+
     typ, data = conn.fetch(num,'(RFC822)')
     msg = email.message_from_string(data[0][1])
-    print msg["subject"]
     yield msg
 
 def getAttachment(msg):
@@ -28,6 +34,7 @@ def getAttachment(msg):
     # return only the first attachment...
     if part.get_content_type().startswith("audio"):
       return part.get_filename(), part.get_payload(decode=1)
+  return (None, None)
 
 def checkEmail(account, password, server, first_run, dest_folder, callback=None):
   for msg in getMsgs(account, passwd=password, servername=server, first=first_run):
@@ -51,7 +58,6 @@ def checkEmail(account, password, server, first_run, dest_folder, callback=None)
 
 def ezrun(callback):
   config = yaml.load(open("air_download.yml", "r"))
-
   checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"], callback)
 
 

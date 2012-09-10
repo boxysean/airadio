@@ -37,6 +37,7 @@ if PASSWORD:
 
 client.clear()
 client.stop()
+client.update()
 
 for f in os.listdir(DIRECTORY):
   print "[+] adding %s" % (f)
@@ -44,11 +45,12 @@ for f in os.listdir(DIRECTORY):
 
 try:
   while True:
-    air_download.ezrun(lambda x: client.update and client.add(x))
+    air_download.ezrun(lambda x: client.add(x) and client.update())
     time.sleep(WAIT_SECONDS)
+except KeyboardInterrupt:
+  client.disconnect()
 except:
-  print "exiting gracefully"
-  
-client.disconnect()
-
-
+  client.disconnect()
+  raise
+else:
+  client.disconnect()
