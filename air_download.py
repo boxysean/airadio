@@ -29,6 +29,32 @@ def getAttachment(msg):
     if part.get_content_type().startswith("audio"):
       return part.get_filename(), part.get_payload(decode=1)
 
+def checkEmail(account, password, server, first_run, dest_folder, callback=None):
+  for msg in getMsgs(account, passwd=password, servername=server, first=first_run):
+    filename, payload = getAttachment(msg)
+
+    if not payload:
+      continue
+
+    filepath = dest_folder + os.sep + filename
+
+    # Fri, 7 Sep 2012 12:28:21 +0200
+    print "from date", msg["date"], type(msg["date"])
+    if not os.path.isfile(filepath):
+      print "writing %s" % (filename)
+      fp = open(filepath, 'wb')
+      fp.write(payload)
+      fp.close()
+
+    if callback:
+      callback(filepath)
+
+def ezrun(callback):
+  config = yaml.load(open("air_download.yml", "r"))
+
+  checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"], callback)
+
+
 if __name__ == '__main__':
   parser = OptionParser()
 
@@ -39,19 +65,5 @@ if __name__ == '__main__':
 
   config = yaml.load(open(options.config_file, "r"))
 
-  for msg in getMsgs(config["account"], passwd=config["password"], servername=config["server"], first=options.first_run):
-    filename, payload = getAttachment(msg)
-
-    if not payload:
-      continue
-
-    filepath = config["destination_folder"] + os.sep + filename
-
-    # Fri, 7 Sep 2012 12:28:21 +0200
-    print "from date", msg["date"], type(msg["date"])
-    if not os.path.isfile(filepath):
-      print "writing %s" % (filename)
-      fp = open(filepath, 'wb')
-      fp.write(payload)
-      fp.close()
+  checkEmail(config["account"], config["password"], config["server"], options.first_run, config["destination_folder"])
 
