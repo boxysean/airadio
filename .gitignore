@@ -1,0 +1,12 @@
+# Avoid Music Files:
+
+*.aif
+*.aiff
+*.m4a
+*.mp3
+*.mpa
+*.wav
+*.wma
+*.flac
+*.ogg
+
