@@ -45,7 +45,7 @@ for f in os.listdir(DIRECTORY):
 
 try:
   while True:
-    air_download.ezrun(lambda x: client.add(x) and client.update())
+    air_download.ezrun(client)
     time.sleep(WAIT_SECONDS)
 except KeyboardInterrupt:
   client.disconnect()
