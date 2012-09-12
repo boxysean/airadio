@@ -11,6 +11,16 @@ from lib.oauth import read_token_file
 from mpd import MPDClient, CommandError, MPDError
 from socket import error as SocketError
 
+import yaml
+
+CONFIG = yaml.load(open("air_download.conf", "r"))
+
+
+App_Name = CONFIG["twitter_app_name"]
+Consumer_key = CONFIG["twitter_consumer_key"]
+Consumer_secret = CONFIG["twitter_consumer_secret"]
+
+
 class Tweet:
     def __init__(self):
         self.generate_config()

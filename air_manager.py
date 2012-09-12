@@ -23,6 +23,7 @@ JINGLE_FREQUENCY = 1
 JINGLE_DIRECTORY = CONFIG["jingle_folder"]
 HOST = CONFIG["mpd_host"]
 PORT = CONFIG["mpd_port"]
+use_twitter = CONFIG["use_twitter"]
 ###
 
 
@@ -104,16 +105,23 @@ if not lists_are_same:
 
 client.disconnect()
 
-tweetManager = Tweet()
+if use_twitter:
+  tweetManager = Tweet()
+  print "::: Twitter is in use!"
+
 previousSong = None
 
 while True:
   client = mpd_connect(HOST, PORT)
 
-  currentSong = client.currentsong()
-  if not previousSong == currentSong:
-    tweetManager.tweet_now_playing(client)
-    previousSong = currentSong
+  if use_twitter:
+    currentSong = client.currentsong()
+    if not previousSong == currentSong:
+      try:
+        tweetManager.tweet_now_playing(client)
+      except:
+        print "tweeting failed!"
+      previousSong = currentSong
 
   new_files = air_download.ezrun()
 
