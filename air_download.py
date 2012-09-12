@@ -5,7 +5,14 @@ import email.utils
 from datetime import datetime
 import time
 
+from mpd import (MPDClient, CommandError)
+from socket import error as SocketError
+
 from optparse import OptionParser
+
+HOST = 'boxysean.com'
+PORT = '6600'
+PASSWORD = False
 
 audio_ext = ["aif", "aiff", "m4a", "mp3", "mpa", "wav", "wma", "flac", "ogg"]
 
@@ -53,6 +60,8 @@ def getAttachment(msg):
   for part in msg.walk():
     # return only the first attachment...
     filename = part.get_filename()
+    if filename and "utf-8" in filename:
+      filename = "some_unicode_filename"
     if part.get_content_type().startswith("audio") or (filename and isAudioFile(filename)):
       return filename, part.get_payload(decode=1)
   return (None, None)
@@ -61,11 +70,10 @@ def checkEmail(account, password, server, first_run, dest_folder, client=None):
   for msg, datestring in getMsgs(account, passwd=password, servername=server, first=first_run):
     filename, payload = getAttachment(msg)
 
-    filename = datestring + "_" + filename
-
     if not payload:
       continue
 
+    filename = datestring + "_" + filename
     filepath = dest_folder + os.sep + filename
 
     if not os.path.isfile(filepath):
@@ -75,10 +83,24 @@ def checkEmail(account, password, server, first_run, dest_folder, client=None):
       fp.close()
 
     if client:
+      try:
+        client.connect(host=HOST, port=PORT)
+      except SocketError:
+        raise
+      
+      if PASSWORD:
+        try:
+          client.password(PASSWORD)
+        except CommandError:
+          raise
+      
       client.update()
+      time.sleep(5)
       filename = filepath.split(os.sep)[-1]
       print "[+] add %s" % (filename)
       client.add(filename)
+
+      client.disconnect()
 
 def ezrun(client):
   config = yaml.load(open("air_download.yml", "r"))

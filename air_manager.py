@@ -13,10 +13,10 @@ import os
 
 ## SETTINGS
 ##
-HOST = 'localhost'
+HOST = 'boxysean.com'
 PORT = '6600'
 PASSWORD = False
-WAIT_SECONDS = 60
+WAIT_SECONDS = 5
 CONFIG = yaml.load(open("air_download.yml", "r"))
 DIRECTORY = CONFIG["destination_folder"]
 ###
@@ -27,30 +27,24 @@ client = MPDClient()
 try:
     client.connect(host=HOST, port=PORT)
 except SocketError:
-    exit(1)
+    raise
 
 if PASSWORD:
     try:
         client.password(PASSWORD)
     except CommandError:
-        exit(1)
+        raise
 
 client.clear()
 client.stop()
 client.update()
 
-for f in os.listdir(DIRECTORY):
+for f in sorted(os.listdir(DIRECTORY)):
   print "[+] adding %s" % (f)
   client.add(f)
 
-try:
-  while True:
-    air_download.ezrun(client)
-    time.sleep(WAIT_SECONDS)
-except KeyboardInterrupt:
-  client.disconnect()
-except:
-  client.disconnect()
-  raise
-else:
-  client.disconnect()
+client.disconnect()
+
+while True:
+  air_download.ezrun(client)
+  time.sleep(WAIT_SECONDS)
