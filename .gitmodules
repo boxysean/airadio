@@ -1,0 +1,3 @@
+[submodule "Submodules/mpd-tweet"]
+	path = Submodules/mpd-tweet
+	url = git://github.com/parth115/mpd-tweet.git
