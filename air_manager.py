@@ -6,6 +6,8 @@ from random import choice, shuffle
 from socket import error as SocketError
 from sys import exit
 
+from mpd_tweet import Tweet
+
 import air_download
 import time
 import yaml
@@ -102,12 +104,21 @@ if not lists_are_same:
 
 client.disconnect()
 
+tweetManager = Tweet()
+previousSong = None
+
 while True:
+  client = mpd_connect(HOST, PORT)
+
+  currentSong = client.currentsong()
+  if not previousSong == currentSong:
+    tweetManager.tweet_now_playing(client)
+    previousSong = currentSong
+
   new_files = air_download.ezrun()
 
   if new_files:
     print "new files found!", new_files
-    client = mpd_connect(HOST, PORT)
     for filename in new_files:
       client.update()
       time.sleep(5) # allow for the update to happen
@@ -126,7 +137,6 @@ while True:
     if not client.status()["state"] == "play" and len(client.playlistinfo()):
       client.play(0)
 
-    client.disconnect()
-
+  client.disconnect()
   time.sleep(WAIT_SECONDS)
 

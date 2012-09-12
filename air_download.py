@@ -64,12 +64,6 @@ def getAttachment(msg):
     if filename_encoding and filename_encoding == "base64":
       if filename and "utf-8" in filename:
         filename = filename[10:-2].decode("base64")
-       
-#    if filename and "utf-8" in filename:
-#      print filename
-#      print "functions available:::::", dir(part)
-#      print "keys available::::::", part.keys()
-#      filename = #"some_unicode_filename"
     if part.get_content_type().startswith("audio") or (filename and isAudioFile(filename)):
       return filename, part.get_payload(decode=1)
   return (None, None)
