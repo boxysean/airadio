@@ -13,14 +13,14 @@ import os
 
 ## SETTINGS
 ##
-HOST = 'boxysean.com'
-PORT = '6600'
 PASSWORD = False
 WAIT_SECONDS = 5
 CONFIG = yaml.load(open("air_download.conf", "r"))
 DIRECTORY = CONFIG["destination_folder"]
 JINGLE_FREQUENCY = 1
-JINGLE_DIRECTORY = "download/jingles"
+JINGLE_DIRECTORY = CONFIG["jingle_folder"]
+HOST = CONFIG["mpd_host"]
+PORT = CONFIG["mpd_port"]
 ###
 
 
