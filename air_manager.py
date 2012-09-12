@@ -13,14 +13,14 @@ import os
 
 ## SETTINGS
 ##
-HOST = 'localhost'
+HOST = 'boxysean.com'
 PORT = '6600'
 PASSWORD = False
 WAIT_SECONDS = 5
 CONFIG = yaml.load(open("air_download.conf", "r"))
 DIRECTORY = CONFIG["destination_folder"]
-JINGLE_FREQUENCY = 2
-JINGLE_DIRECTORY = "/var/lib/mpd/music/jingles"
+JINGLE_FREQUENCY = 1
+JINGLE_DIRECTORY = "download/jingles"
 ###
 
 
@@ -58,6 +58,7 @@ shuffle(jingles)
 desired_order = sorted([f for f in os.listdir(DIRECTORY) if os.path.isfile(os.path.join(DIRECTORY, f))]) 
 
 # add jingles
+jingle_idx = 0
 n_songs_after_jingles = len(desired_order) + len(desired_order)/JINGLE_FREQUENCY
 for jingle_idx, j in enumerate(range(0, n_songs_after_jingles, JINGLE_FREQUENCY+1)):
   desired_order.insert(j, os.path.join("jingles", jingles[jingle_idx%len(jingles)]))
@@ -89,6 +90,8 @@ if not lists_are_same:
 
   # remake list
   client.clear()
+  client.update()
+  time.sleep(5)
   for i in desired_order:
     print "[+] adding %s" % (i)
     client.add(i)
