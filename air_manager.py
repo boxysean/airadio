@@ -62,25 +62,29 @@ desired_order = sorted([f for f in os.listdir(DIRECTORY) if os.path.isfile(os.pa
 
 # add jingles
 jingle_idx = 0
-n_songs_after_jingles = len(desired_order) + len(desired_order)/JINGLE_FREQUENCY
-for jingle_idx, j in enumerate(range(0, n_songs_after_jingles, JINGLE_FREQUENCY+1)):
-  desired_order.insert(j, os.path.join("jingles", jingles[jingle_idx%len(jingles)]))
+if jingles:
+  n_songs_after_jingles = len(desired_order) + len(desired_order)/JINGLE_FREQUENCY
+  for jingle_idx, j in enumerate(range(0, n_songs_after_jingles, JINGLE_FREQUENCY+1)):
+    desired_order.insert(j, os.path.join("jingles", jingles[jingle_idx%len(jingles)]))
 
-print ":::desired order:::"
+print "::: Desired order"
 print "\n".join(desired_order)
+print ""
 
 client = mpd_connect(HOST, PORT)
 client.repeat(1)
 
 present_order = map(lambda x: x["file"], client.playlistinfo())
 
-print ":::present order:::"
+print "::: Present order"
 print "\n".join(present_order)
+print ""
 
 lists_are_same = sameList(desired_order, present_order)
-print ":::is it okay now?:::", lists_are_same
 
 if not lists_are_same:
+  print "::: Remaking mpd playlist"
+
   # store present song
   mpd_status = client.status()
   current_song = client.currentsong()
@@ -107,7 +111,7 @@ client.disconnect()
 
 if use_twitter:
   tweetManager = Tweet()
-  print "::: Twitter is in use!"
+  print "::: Twitter is in use"
 
 previousSong = None
 
@@ -120,19 +124,19 @@ while True:
       try:
         tweetManager.tweet_now_playing(client)
       except:
-        print "tweeting failed!"
+        print "::: Tweeting failed"
       previousSong = currentSong
 
   new_files = air_download.ezrun()
 
   if new_files:
-    print "new files found!", new_files
+    print "::: New files found", new_files
     for filename in new_files:
       client.update()
       time.sleep(5) # allow for the update to happen
 
       # check if we should add a jingle now
-      if (len(client.playlistinfo()) % (JINGLE_FREQUENCY+1)) == 0:
+      if jingles and (len(client.playlistinfo()) % (JINGLE_FREQUENCY+1)) == 0:
         jingle_idx = jingle_idx+1
         jingle = jingles[jingle_idx%len(jingles)]
         print "[+] add %s" % (jingle)

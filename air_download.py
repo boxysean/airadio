@@ -5,14 +5,7 @@ import email.utils
 from datetime import datetime
 import time
 
-from mpd import (MPDClient, CommandError)
-from socket import error as SocketError
-
 from optparse import OptionParser
-
-HOST = 'boxysean.com'
-PORT = '6600'
-PASSWORD = False
 
 audio_ext = ["aif", "aiff", "m4a", "mp3", "mpa", "wav", "wma", "flac", "ogg"]
 
@@ -45,6 +38,7 @@ def getMsgs(usernm, passwd=None, servername="imap.gmail.com", first=True):
     header_data = hdata[1][0][1]
     header_data_array = header_data.split("\n")
 
+    print ""
     print ":::new message details:::"
     print header_data.strip()
     print ":::::::::::::::::::::::::"
