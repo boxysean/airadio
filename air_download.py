@@ -66,7 +66,9 @@ def getAttachment(msg):
       return filename, part.get_payload(decode=1)
   return (None, None)
 
-def checkEmail(account, password, server, first_run, dest_folder, client=None):
+def checkEmail(account, password, server, first_run, dest_folder):
+  res = []
+
   for msg, datestring in getMsgs(account, passwd=password, servername=server, first=first_run):
     filename, payload = getAttachment(msg)
 
@@ -81,30 +83,13 @@ def checkEmail(account, password, server, first_run, dest_folder, client=None):
       fp = open(filepath, 'wb')
       fp.write(payload)
       fp.close()
+      res.append(filepath.split(os.sep)[-1])
 
-    if client:
-      try:
-        client.connect(host=HOST, port=PORT)
-      except SocketError:
-        raise
-      
-      if PASSWORD:
-        try:
-          client.password(PASSWORD)
-        except CommandError:
-          raise
-      
-      client.update()
-      time.sleep(5)
-      filename = filepath.split(os.sep)[-1]
-      print "[+] add %s" % (filename)
-      client.add(filename)
+  return res
 
-      client.disconnect()
-
-def ezrun(client):
-  config = yaml.load(open("air_download.yml", "r"))
-  checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"], client)
+def ezrun():
+  config = yaml.load(open("air_download.conf", "r"))
+  return checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"])
 
 
 if __name__ == '__main__':

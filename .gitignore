@@ -10,3 +10,8 @@
 *.flac
 *.ogg
 
+# avoid project files:
+
+*.pyc
+*.conf
+
