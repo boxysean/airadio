@@ -66,6 +66,7 @@ print ":::desired order:::"
 print "\n".join(desired_order)
 
 client = mpd_connect(HOST, PORT)
+client.repeat(1)
 
 present_order = map(lambda x: x["file"], client.playlistinfo())
 
@@ -93,7 +94,8 @@ if not lists_are_same:
     client.add(i)
 
   # fast forward to next advertisement... (abrupt kill)
-  client.play(next_song)
+  if len(client.playlistinfo()):
+    client.play(next_song)
 
 client.disconnect()
 
@@ -116,6 +118,11 @@ while True:
 
       print "[+] add %s" % (filename)
       client.add(filename) 
+
+    # in case the station is stopped and receives its first song
+    if not client.status()["state"] == "play" and len(client.playlistinfo()):
+      client.play(0)
+
     client.disconnect()
 
   time.sleep(WAIT_SECONDS)
