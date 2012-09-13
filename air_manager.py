@@ -16,7 +16,6 @@ import os
 ## SETTINGS
 ##
 PASSWORD = False
-WAIT_SECONDS = 5
 CONFIG = yaml.load(open("air_download.conf", "r"))
 DIRECTORY = CONFIG["destination_folder"]
 JINGLE_FREQUENCY = 1
@@ -24,6 +23,11 @@ JINGLE_DIRECTORY = CONFIG["jingle_folder"]
 HOST = CONFIG["mpd_host"]
 PORT = CONFIG["mpd_port"]
 use_twitter = CONFIG["use_twitter"]
+
+try:
+  WAIT_SECONDS = CONFIG["email_interval"]
+except:
+  WAIT_SECONDS = 60
 ###
 
 
