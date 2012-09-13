@@ -52,14 +52,21 @@ def mpd_connect(host, port, password=None):
 
   return client
 
-def sameList(a, b):
-  if len(a) is not len(b):
+def jingles_exist(l):
+  jingles = (filter(lambda x: "jingle" in x, l))
+  for jingle in jingles:
+    if not os.path.isfile(os.path.join(DIRECTORY, jingle)):
+      return False
+  return True
+
+def sameList(new, old):
+  if len(new) is not len(old):
     return False 
-  
-  for i in range(len(a)):
-    if "jingle" in a[i] and "jingle" in b[i]:
+
+  for i in range(len(new)):
+    if "jingle" in new[i] and "jingle" in old[i]:
       continue
-    elif not a[i] == b[i]:
+    elif not new[i] == old[i]:
       return False
 
   return True
@@ -91,7 +98,7 @@ print ""
 
 lists_are_same = sameList(desired_order, present_order)
 
-if not lists_are_same:
+if not lists_are_same or not jingles_exist(present_order):
   print "::: Remaking mpd playlist"
 
   # store present song
@@ -114,13 +121,17 @@ if not lists_are_same:
 
   # fast forward to next advertisement... (abrupt kill)
   if len(client.playlistinfo()):
+    print "[>] pressing play"
     client.play(next_song)
-
-client.disconnect()
 
 if use_twitter:
   tweetManager = Tweet()
   print "::: Twitter is in use"
+
+mpd_status = client.status()
+print "[?] mpd state:", mpd_status["state"]
+
+client.disconnect()
 
 previousSong = None
 
@@ -139,7 +150,7 @@ while True:
   new_files = air_download.ezrun()
 
   if new_files:
-    print "::: New files found", new_files
+    print "::: %d new file(s) found" % (len(new_files))
     for filename in new_files:
       client.update()
       time.sleep(5) # allow for the update to happen
@@ -156,6 +167,7 @@ while True:
 
     # in case the station is stopped and receives its first song
     if not client.status()["state"] == "play" and len(client.playlistinfo()):
+      print "[>] pressing play"
       client.play(0)
 
   client.disconnect()
