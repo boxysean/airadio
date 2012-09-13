@@ -73,8 +73,9 @@ def getAttachment(msg):
 def checkEmail(account, password, server, first_run, dest_folder, respond_to_emails, smtp_server, response_text):
   res = []
 
-  conn_res = smtplib.SMTP_SSL(smtp_server, 465)
-  conn_res.login(account, password)
+  if respond_to_emails and smtp_server:
+    conn_res = smtplib.SMTP_SSL(smtp_server, 465)
+    conn_res.login(account, password)
 
   for msg, datestring, sender in getMsgs(account, passwd=password, servername=server, first=first_run):
     filename, payload = getAttachment(msg)
@@ -92,7 +93,7 @@ def checkEmail(account, password, server, first_run, dest_folder, respond_to_ema
       fp.close()
       res.append(filepath.split(os.sep)[-1])
 
-      if respond_to_emails:
+      if respond_to_emails and smtp_server:
         try:
           response = response_text
           data = MIMEMultipart()
@@ -112,7 +113,19 @@ def checkEmail(account, password, server, first_run, dest_folder, respond_to_ema
 
 def ezrun():
   config = yaml.load(open("air_download.conf", "r"))
-  return checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"], config["respond_to_emails"], config["smtp_server"], config["response_text"])
+
+  try:
+    respond_to_emails = config["respond_to_emails"]
+    smtp_server = config["smtp_server"]
+    response_text = config["response_text"]
+
+  except KeyError:
+    respond_to_emails = False
+    smtp_server = None
+    response_text = 'Hvala!'
+
+
+  return checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"], respond_to_emails, smtp_server, response_text)
 
 
 if __name__ == '__main__':
@@ -125,5 +138,16 @@ if __name__ == '__main__':
 
   config = yaml.load(open(options.config_file, "r"))
 
-  checkEmail(config["account"], config["password"], config["server"], options.first_run, config["destination_folder"], config["respond_to_emails"], config["smtp_server"], config["response_text"])
+  try:
+    respond_to_emails = config["respond_to_emails"]
+    smtp_server = config["smtp_server"]
+    response_text = config["response_text"]
+
+  except KeyError:
+    respond_to_emails = False
+    smtp_server = None
+    response_text = 'Hvala!'
+
+
+  checkEmail(config["account"], config["password"], config["server"], options.first_run, config["destination_folder"], respond_to_emails, smtp_server, response_text)
 
