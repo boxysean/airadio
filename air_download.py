@@ -1,7 +1,10 @@
-import getpass, os, imaplib, email
+import getpass, os, imaplib, smtplib, email
 import yaml
 import sys
 import email.utils
+from email.parser import HeaderParser
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from datetime import datetime
 import time
 
@@ -52,9 +55,14 @@ def getMsgs(usernm, passwd=None, servername="imap.gmail.com", first=True):
     date = filter(lambda x: x.startswith("Date"), header_data_array)[0]
     datestring = parseDate(date[6:])
 
+    parser = HeaderParser()
+    parsed_header_data = parser.parsestr(header_data)
+    origin = parsed_header_data['From']
+    sender = email.utils.parseaddr(origin)[1]
+
     typ, data = conn.fetch(num,'(RFC822)')
     msg = email.message_from_string(data[0][1])
-    yield (msg, datestring)
+    yield (msg, datestring, sender)
 
 def getAttachment(msg):
   for part in msg.walk():
@@ -68,10 +76,13 @@ def getAttachment(msg):
       return filename, part.get_payload(decode=1)
   return (None, None)
 
-def checkEmail(account, password, server, first_run, dest_folder):
+def checkEmail(account, password, server, first_run, dest_folder, respond_to_emails, smtp_server, response_text):
   res = []
 
-  for msg, datestring in getMsgs(account, passwd=password, servername=server, first=first_run):
+  conn_res = smtplib.SMTP_SSL(smtp_server, 465)
+  conn_res.login(account, password)
+
+  for msg, datestring, sender in getMsgs(account, passwd=password, servername=server, first=first_run):
     filename, payload = getAttachment(msg)
 
     if not payload:
@@ -87,11 +98,27 @@ def checkEmail(account, password, server, first_run, dest_folder):
       fp.close()
       res.append(filepath.split(os.sep)[-1])
 
+      if respond_to_emails:
+        try:
+          response = response_text
+          data = MIMEMultipart()
+          data['Subject'] = 'Thanks from %s' % (account)
+          data['From'] = account + '@gmail.com'
+          data['To'] = sender
+
+          data.attach(MIMEText(response, 'plain'))
+
+          conn_res.sendmail(account, sender, data.as_string())
+
+        except Exception, e:
+          print 'Failed to send email response because of:  ', e
+
+
   return res
 
 def ezrun():
   config = yaml.load(open("air_download.conf", "r"))
-  return checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"])
+  return checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"], config["respond_to_emails"], config["smtp_server"], config["response_text"])
 
 
 if __name__ == '__main__':
@@ -104,5 +131,5 @@ if __name__ == '__main__':
 
   config = yaml.load(open(options.config_file, "r"))
 
-  checkEmail(config["account"], config["password"], config["server"], options.first_run, config["destination_folder"])
+  checkEmail(config["account"], config["password"], config["server"], options.first_run, config["destination_folder"], config["respond_to_emails"], config["smtp_server"], config["response_text"])
 
