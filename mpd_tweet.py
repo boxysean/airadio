@@ -44,10 +44,11 @@ class Tweet:
           return
 
         try:
-            status = ("Listening to \"%s\" by \"%s\" #nowplaying" ) % (currentSong['title'], currentSong['artist'])
+          status = ("Listening to \"%s\" by \"%s\" #nowplaying" ) % (currentSong['title'], currentSong['artist'])
         except KeyError:
-            status = ("Listening to %s #nowplaying" ) % (currentSong['file'] )
-        print status 
+          status = ("Listening to %s #nowplaying" ) % (currentSong['file'] )
+
+        print "[t] %s" % (status )
         self.api.UpdateStatus(status)
         
             
