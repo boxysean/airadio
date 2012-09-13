@@ -13,6 +13,8 @@ from socket import error as SocketError
 
 import yaml
 
+from air_utils import log_it
+
 CONFIG = yaml.load(open("air_download.conf", "r"))
 
 
@@ -48,7 +50,7 @@ class Tweet:
         except KeyError:
           status = ("Listening to %s #nowplaying" ) % (currentSong['file'] )
 
-        print "[t] %s" % (status )
+        log_it("[t] %s" % (status))
         self.api.UpdateStatus(status)
         
             

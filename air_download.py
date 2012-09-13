@@ -8,6 +8,8 @@ from email.mime.text import MIMEText
 from datetime import datetime
 import time
 
+from air_utils import log_it
+
 from optparse import OptionParser
 
 audio_ext = ["aif", "aiff", "m4a", "mp3", "mpa", "wav", "wma", "flac", "ogg"]
@@ -34,17 +36,17 @@ def getMsgs(usernm, passwd=None, servername="imap.gmail.com", first=True):
     typ, data = conn.search(None,'UnSeen')
 
   if data[0]:
-    print "new message(s)!"
+    log_it("new message(s)!")
 
   for num in data[0].split():
     hdata = conn.fetch(num, '(BODY[HEADER.FIELDS (SUBJECT FROM DATE)])')
     header_data = hdata[1][0][1]
     header_data_array = header_data.split("\n")
 
-    print ""
-    print ":::new message details:::"
-    print header_data.strip()
-    print ":::::::::::::::::::::::::"
+    log_it("")
+    log_it(":::new message details:::")
+    log_it(header_data.strip())
+    log_it(":::::::::::::::::::::::::")
 
     date = filter(lambda x: x.startswith("Date"), header_data_array)[0]
     datestring = parseDate(date[6:])
@@ -87,7 +89,7 @@ def checkEmail(account, password, server, first_run, dest_folder, respond_to_ema
     filepath = dest_folder + os.sep + filename
 
     if not os.path.isfile(filepath):
-      print "[<] writing %s" % (filename)
+      log_it("[<] writing %s" % (filename))
       fp = open(filepath, 'wb')
       fp.write(payload)
       fp.close()
@@ -104,10 +106,10 @@ def checkEmail(account, password, server, first_run, dest_folder, respond_to_ema
           data.attach(MIMEText(response, 'plain'))
 
           conn_res.sendmail(account, sender, data.as_string())
-          print "::: Sent thank you email"
+          log_it("::: Sent thank you email")
 
         except Exception, e:
-          print 'Failed to send email response because of:  ', e
+          log_it('Failed to send email response because of:  '+ e)
 
 
   return res

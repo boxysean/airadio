@@ -4,6 +4,8 @@ server: imap.gmail.com
 destination_folder: /var/lib/mpd/music
 jingle_folder: /var/lib/mpd/music/jingles
 
+log_to_file: False
+
 mpd_host: localhost
 mpd_port: 6600
 

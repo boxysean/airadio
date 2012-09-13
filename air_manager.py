@@ -13,6 +13,8 @@ import time
 import yaml
 import os
 
+from air_utils import log_it
+
 ## SETTINGS
 ##
 PASSWORD = False
@@ -83,23 +85,23 @@ if jingles:
   for jingle_idx, j in enumerate(range(0, n_songs_after_jingles, JINGLE_FREQUENCY+1)):
     desired_order.insert(j, os.path.join("jingles", jingles[jingle_idx%len(jingles)]))
 
-print "::: Desired order"
-print "\n".join(desired_order)
-print ""
+log_it("::: Desired order")
+log_it("\n".join(desired_order))
+log_it("")
 
 client = mpd_connect(HOST, PORT)
 client.repeat(1)
 
 present_order = map(lambda x: x["file"], client.playlistinfo())
 
-print "::: Present order"
-print "\n".join(present_order)
-print ""
+log_it("::: Present order")
+log_it("\n".join(present_order))
+log_it("")
 
 lists_are_same = sameList(desired_order, present_order)
 
 if not lists_are_same or not jingles_exist(present_order):
-  print "::: Remaking mpd playlist"
+  log_it("::: Remaking mpd playlist")
 
   # store present song
   mpd_status = client.status()
@@ -116,20 +118,20 @@ if not lists_are_same or not jingles_exist(present_order):
   client.update()
   time.sleep(5)
   for i in desired_order:
-    print "[+] adding %s" % (i)
+    log_it("[+] adding %s" % (i))
     client.add(i)
 
   # fast forward to next advertisement... (abrupt kill)
   if len(client.playlistinfo()):
-    print "[>] pressing play"
+    log_it("[>] pressing play")
     client.play(next_song)
 
 if use_twitter:
   tweetManager = Tweet()
-  print "::: Twitter is in use"
+  log_it("::: Twitter is in use")
 
 mpd_status = client.status()
-print "[?] mpd state:", mpd_status["state"]
+log_it("[?] mpd state: " + mpd_status["state"])
 
 client.disconnect()
 
@@ -145,13 +147,13 @@ while True:
       try:
         tweetManager.tweet_now_playing(client)
       except:
-        print "::: Tweeting failed"
+        log_it("::: Tweeting failed")
       previousSong = currentSong
 
   new_files = air_download.ezrun(firstLoop)
 
   if new_files:
-    print "::: %d new file(s) found" % (len(new_files))
+    log_it("::: %d new file(s) found" % (len(new_files)))
     for filename in new_files:
       client.update()
       time.sleep(5) # allow for the update to happen
@@ -160,15 +162,15 @@ while True:
       if jingles and (len(client.playlistinfo()) % (JINGLE_FREQUENCY+1)) == 0:
         jingle_idx = jingle_idx+1
         jingle = jingles[jingle_idx%len(jingles)]
-        print "[+] add %s" % (jingle)
+        log_it("[+] add %s" % (jingle))
         client.add(os.path.join("jingles", jingle))
 
-      print "[+] add %s" % (filename)
+      log_it("[+] add %s" % (filename))
       client.add(filename) 
 
     # in case the station is stopped and receives its first song
     if not client.status()["state"] == "play" and len(client.playlistinfo()):
-      print "[>] pressing play"
+      log_it("[>] pressing play")
       client.play(0)
 
   client.disconnect()
