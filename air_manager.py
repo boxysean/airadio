@@ -134,6 +134,7 @@ print "[?] mpd state:", mpd_status["state"]
 client.disconnect()
 
 previousSong = None
+firstLoop = True
 
 while True:
   client = mpd_connect(HOST, PORT)
@@ -147,7 +148,7 @@ while True:
         print "::: Tweeting failed"
       previousSong = currentSong
 
-  new_files = air_download.ezrun()
+  new_files = air_download.ezrun(firstLoop)
 
   if new_files:
     print "::: %d new file(s) found" % (len(new_files))
@@ -171,5 +172,7 @@ while True:
       client.play(0)
 
   client.disconnect()
+  if firstLoop:
+    firstLoop = False
   time.sleep(WAIT_SECONDS)
 

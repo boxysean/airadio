@@ -104,6 +104,7 @@ def checkEmail(account, password, server, first_run, dest_folder, respond_to_ema
           data.attach(MIMEText(response, 'plain'))
 
           conn_res.sendmail(account, sender, data.as_string())
+          print "::: Sent thank you email"
 
         except Exception, e:
           print 'Failed to send email response because of:  ', e
@@ -111,7 +112,7 @@ def checkEmail(account, password, server, first_run, dest_folder, respond_to_ema
 
   return res
 
-def ezrun():
+def ezrun(disable_response_to_emails = False):
   config = yaml.load(open("air_download.conf", "r"))
 
   try:
@@ -124,6 +125,8 @@ def ezrun():
     smtp_server = None
     response_text = 'Hvala!'
 
+  if disable_response_to_emails:
+    respond_to_emails = False
 
   return checkEmail(config["account"], config["password"], config["server"], False, config["destination_folder"], respond_to_emails, smtp_server, response_text)
 
