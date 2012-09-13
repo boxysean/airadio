@@ -18,7 +18,12 @@ import os
 PASSWORD = False
 CONFIG = yaml.load(open("air_download.conf", "r"))
 DIRECTORY = CONFIG["destination_folder"]
-JINGLE_FREQUENCY = 1
+
+try:
+  JINGLE_FREQUENCY = CONFIG["jingle_frequency"]
+except:
+  JINGLE_FREQUENCY = 2
+
 JINGLE_DIRECTORY = CONFIG["jingle_folder"]
 HOST = CONFIG["mpd_host"]
 PORT = CONFIG["mpd_port"]
