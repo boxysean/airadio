@@ -1,0 +1,21 @@
+account: interactivosradio
+password: ljudmila
+server: imap.gmail.com
+destination_folder: /var/lib/mpd/music
+jingle_folder: /var/lib/mpd/music/jingles
+
+mpd_host: localhost
+mpd_port: 6600
+
+use_twitter: false
+twitter_app_name: "Ljudmila-MPD-Tweet"
+twitter_consumer_key: "FVe1jE1h6B6ZiJ0qNoJx3g"
+twitter_consumer_secret: "CgvcbXzZ0ZN1tyYzsp8vj109OMbkVGW5UOyRFDDE1No"
+
+email_interval: 60
+
+jingle_frequency: 1
+
+respond_to_emails: True
+smtp_server: smtp.gmail.com
+response_text: "Sweet!  Thanks for submitting to Air Interactive Radio.  Your track is queued up and will be played shortly.  Stay tuned..."
