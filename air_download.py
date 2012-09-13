@@ -8,14 +8,7 @@ from email.mime.text import MIMEText
 from datetime import datetime
 import time
 
-from mpd import (MPDClient, CommandError)
-from socket import error as SocketError
-
 from optparse import OptionParser
-
-HOST = 'boxysean.com'
-PORT = '6600'
-PASSWORD = False
 
 audio_ext = ["aif", "aiff", "m4a", "mp3", "mpa", "wav", "wma", "flac", "ogg"]
 
@@ -48,6 +41,7 @@ def getMsgs(usernm, passwd=None, servername="imap.gmail.com", first=True):
     header_data = hdata[1][0][1]
     header_data_array = header_data.split("\n")
 
+    print ""
     print ":::new message details:::"
     print header_data.strip()
     print ":::::::::::::::::::::::::"
@@ -92,7 +86,7 @@ def checkEmail(account, password, server, first_run, dest_folder, respond_to_ema
     filepath = dest_folder + os.sep + filename
 
     if not os.path.isfile(filepath):
-      print "writing %s" % (filename)
+      print "[<] writing %s" % (filename)
       fp = open(filepath, 'wb')
       fp.write(payload)
       fp.close()

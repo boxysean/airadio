@@ -16,14 +16,23 @@ import os
 ## SETTINGS
 ##
 PASSWORD = False
-WAIT_SECONDS = 5
 CONFIG = yaml.load(open("air_download.conf", "r"))
 DIRECTORY = CONFIG["destination_folder"]
-JINGLE_FREQUENCY = 1
+
+try:
+  JINGLE_FREQUENCY = CONFIG["jingle_frequency"]
+except:
+  JINGLE_FREQUENCY = 2
+
 JINGLE_DIRECTORY = CONFIG["jingle_folder"]
 HOST = CONFIG["mpd_host"]
 PORT = CONFIG["mpd_port"]
 use_twitter = CONFIG["use_twitter"]
+
+try:
+  WAIT_SECONDS = CONFIG["email_interval"]
+except:
+  WAIT_SECONDS = 60
 ###
 
 
@@ -43,14 +52,21 @@ def mpd_connect(host, port, password=None):
 
   return client
 
-def sameList(a, b):
-  if len(a) is not len(b):
+def jingles_exist(l):
+  jingles = (filter(lambda x: "jingle" in x, l))
+  for jingle in jingles:
+    if not os.path.isfile(os.path.join(DIRECTORY, jingle)):
+      return False
+  return True
+
+def sameList(new, old):
+  if len(new) is not len(old):
     return False 
-  
-  for i in range(len(a)):
-    if "jingle" in a[i] and "jingle" in b[i]:
+
+  for i in range(len(new)):
+    if "jingle" in new[i] and "jingle" in old[i]:
       continue
-    elif not a[i] == b[i]:
+    elif not new[i] == old[i]:
       return False
 
   return True
@@ -62,25 +78,29 @@ desired_order = sorted([f for f in os.listdir(DIRECTORY) if os.path.isfile(os.pa
 
 # add jingles
 jingle_idx = 0
-n_songs_after_jingles = len(desired_order) + len(desired_order)/JINGLE_FREQUENCY
-for jingle_idx, j in enumerate(range(0, n_songs_after_jingles, JINGLE_FREQUENCY+1)):
-  desired_order.insert(j, os.path.join("jingles", jingles[jingle_idx%len(jingles)]))
+if jingles:
+  n_songs_after_jingles = len(desired_order) + len(desired_order)/JINGLE_FREQUENCY
+  for jingle_idx, j in enumerate(range(0, n_songs_after_jingles, JINGLE_FREQUENCY+1)):
+    desired_order.insert(j, os.path.join("jingles", jingles[jingle_idx%len(jingles)]))
 
-print ":::desired order:::"
+print "::: Desired order"
 print "\n".join(desired_order)
+print ""
 
 client = mpd_connect(HOST, PORT)
 client.repeat(1)
 
 present_order = map(lambda x: x["file"], client.playlistinfo())
 
-print ":::present order:::"
+print "::: Present order"
 print "\n".join(present_order)
+print ""
 
 lists_are_same = sameList(desired_order, present_order)
-print ":::is it okay now?:::", lists_are_same
 
-if not lists_are_same:
+if not lists_are_same or not jingles_exist(present_order):
+  print "::: Remaking mpd playlist"
+
   # store present song
   mpd_status = client.status()
   current_song = client.currentsong()
@@ -101,13 +121,17 @@ if not lists_are_same:
 
   # fast forward to next advertisement... (abrupt kill)
   if len(client.playlistinfo()):
+    print "[>] pressing play"
     client.play(next_song)
-
-client.disconnect()
 
 if use_twitter:
   tweetManager = Tweet()
-  print "::: Twitter is in use!"
+  print "::: Twitter is in use"
+
+mpd_status = client.status()
+print "[?] mpd state:", mpd_status["state"]
+
+client.disconnect()
 
 previousSong = None
 
@@ -120,19 +144,19 @@ while True:
       try:
         tweetManager.tweet_now_playing(client)
       except:
-        print "tweeting failed!"
+        print "::: Tweeting failed"
       previousSong = currentSong
 
   new_files = air_download.ezrun()
 
   if new_files:
-    print "new files found!", new_files
+    print "::: %d new file(s) found" % (len(new_files))
     for filename in new_files:
       client.update()
       time.sleep(5) # allow for the update to happen
 
       # check if we should add a jingle now
-      if (len(client.playlistinfo()) % (JINGLE_FREQUENCY+1)) == 0:
+      if jingles and (len(client.playlistinfo()) % (JINGLE_FREQUENCY+1)) == 0:
         jingle_idx = jingle_idx+1
         jingle = jingles[jingle_idx%len(jingles)]
         print "[+] add %s" % (jingle)
@@ -143,6 +167,7 @@ while True:
 
     # in case the station is stopped and receives its first song
     if not client.status()["state"] == "play" and len(client.playlistinfo()):
+      print "[>] pressing play"
       client.play(0)
 
   client.disconnect()
