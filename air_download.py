@@ -75,7 +75,7 @@ def checkEmail(account, password, server, first_run, dest_folder):
     filepath = dest_folder + os.sep + filename
 
     if not os.path.isfile(filepath):
-      print "writing %s" % (filename)
+      print "[<] writing %s" % (filename)
       fp = open(filepath, 'wb')
       fp.write(payload)
       fp.close()
