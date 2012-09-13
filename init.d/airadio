@@ -1,0 +1,56 @@
+#!/bin/bash
+# /etc/init.d/airadio
+#
+
+### BEGIN INIT INFO
+# Provides:          airadio
+# Required-Start:
+# Required-Stop:
+# Should-Start:      
+# Should-Stop:
+# Default-Start:     
+# Default-Stop:
+# Short-Description: 
+# Description:       
+### END INIT INFO
+
+
+# Some things that run always
+touch /var/lock/airadio
+
+if [[ $(whoami) != "root" ]]; then
+  echo "run as root"
+  exit 1
+fi
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting script airadio "
+    if [[ -e /var/run/airadio.pid ]]; then
+      PID=$(cat /var/run/airadio.pid)
+      if (ps -p $PID); then
+        echo "already running"
+        exit
+      fi
+    fi
+    cd /home/pi/workspace/airadio
+    python air_manager.py &
+    echo $! > /var/run/airadio.pid
+    ;;
+  stop)
+    if [[ -e /var/run/airadio.pid ]]; then
+      echo "Stopping script airadio"
+      PID=$(cat /var/run/airadio.pid)
+      kill $PID
+      rm /var/run/airadio.pid
+    fi
+    ;;
+  *)
+    echo "Usage: /etc/init.d/airadio {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0
+
