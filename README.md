@@ -1,7 +1,14 @@
 Autonomous Interactive Radio
 ============================
 
-A radio station manager that queues and plays songs (mp3s, m4as, etc.) received by email.
+A radio station manager program that queues and plays all songs (mp3s, m4as, etc.) received by email.
+
+![air cycle](http://dump.boxysean.com/air-cycle.png)
+
+Requirements
+------------
+
+Tested on Ubuntu 11.04 and with python versions 2.7.1 and 2.7.3. See `requirements.txt` for required python libraries and versions.
 
 Features
 --------
@@ -21,9 +28,11 @@ Debian installation instructions
 5. Edit `air_download.conf` (suggest making a new email account for this)
 4. `python air_manager.py`
 
-To make this a service on startup, 
+To make this a service on startup ([from here](http://www.debian-administration.org/articles/28)):
 
-Tested on python versions 2.7.1 and 2.7.3
+1. Edit `AIR_DIR` variable in `init.d/airadio`
+2. `sudo cp init.d/airadio /etc/init.d/`
+3. `update-rc.d airadio defaults`
 
 Outputting to FM broadcast transmitter
 --------------------------------------

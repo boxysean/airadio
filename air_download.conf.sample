@@ -106,6 +106,15 @@ smtp_server: smtp.emailserver.com
 #
 # What would you like your thank you email to say?
 #
-response_text: "Sweet!  Thanks for submitting to Autonomous Interactive Radio.  Your track is queued up and will be played shortly.  Stay tuned..."log_to_file: False
+response_text: "Sweet!  Thanks for submitting to Autonomous Interactive Radio.  Your track is queued up and will be played shortly.  Stay tuned..."
+#
+############################################################################
+# 
+# Email settings
+# --------------
+#
+# Enable/disable file logging. It will log to /var/log/airadio if enabled,
+# otherwise to the console. Enable to run this as a service.
+log_to_file: False
 #
 ############################################################################
