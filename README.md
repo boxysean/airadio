@@ -5,10 +5,10 @@ A radio station manager program that queues and plays all songs (mp3s, m4as, etc
 
 ![air cycle](http://dump.boxysean.com/air-cycle.png)
 
-Requirements
-------------
+Environment
+-----------
 
-Tested on Ubuntu 11.04 and with python versions 2.7.1 and 2.7.3. See `requirements.txt` for required python libraries and versions.
+Tested on Ubuntu 11.04 and with Raspberry Pi, running python versions 2.7.1 and 2.7.3. See `requirements.txt` for required python libraries and versions.
 
 Features
 --------
@@ -22,11 +22,11 @@ Debian installation instructions
 --------------------------------
 
 1. `apt-get install pip mpd mpc`
-2. `pip install -U -r requirements.txt
+2. `pip install -U -r requirements.txt`
 3. `git clone git@github.com:boxysean/airadio.git`
 4. `cp air_download.conf.sample air_download.conf`
 5. Edit `air_download.conf` (suggest making a new email account for this)
-4. `python air_manager.py`
+4. `python air_manager.py` (may need to run as root)
 
 To make this a service on startup ([from here](http://www.debian-administration.org/articles/28)):
 
@@ -45,3 +45,9 @@ Streaming to an Icecast server
 `mpd` has built in functionality to stream what it plays to an Icecast server. This gives you the option to stream Autonomous Interactive Radio to your friends via the Internet. [Learn how to do this](http://www.omskakas.se/2006/06/your-own-internet-radio-station-with-mpdicecast.html).
 
 [Learn how to do this on a Raspberry Pi](http://www.t3node.com/blog/streaming-audio-with-mpd-and-icecast2-on-raspberry-pi/), but I warn you that the Raspi is CPU-bound when it does this and tends to have choppy playback.
+
+To do list
+----------
+
+Check it out [here](https://github.com/boxysean/airadio/wiki/TODO)!
+

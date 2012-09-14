@@ -1,8 +1,5 @@
 #! /usr/bin/env python
 
-App_Name = "MPD-Tweet"
-Consumer_key = "FVe1jE1h6B6ZiJ0qNoJx3g"
-Consumer_secret = "CgvcbXzZ0ZN1tyYzsp8vj109OMbkVGW5UOyRFDDE1No"
 Config_file = "config"
 
 from lib.oauth_dance import oauth_dance
