@@ -51,9 +51,10 @@ server: imap.emailserver.com
 #
 # jingle_folder: jingles
 #
-# This setting is the number of songs to play before playing a jingle.
+# This setting is the number of songs that are played before playing a
+# jingle.
 #
-jingle_frequency: 2
+jingle_after: 2
 #
 #
 ############################################################################

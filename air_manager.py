@@ -26,7 +26,7 @@ except:
   DIRECTORY = "/var/lib/mpd/music"
 
 try:
-  JINGLE_FREQUENCY = CONFIG["jingle_frequency"]
+  JINGLE_FREQUENCY = CONFIG["jingle_after"]
 except:
   JINGLE_FREQUENCY = 2
 
