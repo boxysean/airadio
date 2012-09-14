@@ -1,23 +1,110 @@
-account: interactivosradio
+############################################################################
+#
+#  ########################################################################
+#  ##                                                                    ##
+#  ##            ###                 ####           ############         ##
+#  ##           ## ##                ####           ####    ####         ##
+#  ##          ##   ##               ####           ####    ####         ##
+#  ##         ##     ##              ####           ####    ####         ##
+#  ##        ###########             ####           ###########          ##
+#  ##       #############            ####           #######              ##
+#  ##      ###         ###           ####           #### ####            ##
+#  ##     ####         ####          ####           ####  ####           ##
+#  ##    #####         #####     ##  ####    ##     ####   ####     ##   ##
+#  ##   ######         ######    ##  ####    ##     ####    #####   ##   ##
+#  ##                                                                    ##
+#  ########################################################################
+#
+#             AUTONOMOUS          INTERACTIVE          RADIO
+#
+############################################################################
+#
+# Email settings
+# --------------
+# This is the account info that will be checked repeatedly for new songs. We# recommend gmail accounts for their 10 GB limits!
+#
+account: changeme
 password: changeme
-server: imap.gmail.com
-destination_folder: /var/lib/mpd/music
-jingle_folder: /var/lib/mpd/music/jingles
-
-log_to_file: False
-
+server: imap.emailserver.com
+#
+# This setting is how many seconds are elapsed between checking the email
+# account to check for new songs. Gmail seems to be pretty lax about
+# spamming the imap server, but the default is 60 to be nice.
+#
+# email_interval: 60
+#
+############################################################################
+#
+# Music file settings
+# -------------------
+#
+# Files will be downloaded and saved to this folder. It defaults to
+# /var/lib/mpd/music, which is the mpd default. Change this if you have
+# changed where mpd expects its files via /etc/mpd.conf.
+#
+# destination_folder: /var/lib/mpd/music
+#
+# This folder contains all the jingles to interject between songs. The
+# jingle folder is found within destination_folder. It has to be within
+# # destination_folder because mpd will only play songs found within its
+# music folder, defined in /etc/mpd.conf. The default is "jingles".
+#
+# jingle_folder: jingles
+#
+# This setting is the number of songs to play before playing a jingle.
+#
+jingle_frequency: 2
+#
+#
+############################################################################
+#
+# mpd settings
+# ------------
+# mpd is a music server. It relies on commands to play music to our
+# soundcard, and this program gives mpd those commands by connecting to it
+# as a client.
+#
+# This is the IP address or hostname and port of the mpd server we want to
+# play AIR on.
+#
 mpd_host: localhost
 mpd_port: 6600
-
+#
+############################################################################
+#
+# Twitter settings
+# ----------------
+# Twitter is used to tweet the current playing song.
+#
+# Enable/disable the use of twitter with this setting.
+#
 use_twitter: false
+#
+# In order to get your Twitter feed to publish your playlist, you need to
+# add an application to your Twitter account via
+# http://developer.twitter.com. Once you have added an application, fill in
+# the following settings and your app should be tweeting away.
+#
 twitter_app_name: "your-app-name"
 twitter_consumer_key: "changeme"
 twitter_consumer_secret: "changeme"
-
-email_interval: 60
-
-jingle_frequency: 1
-
+#
+############################################################################
+#
+# Email settings
+# --------------
+# As this program can receive emails, it can also send! 
+#
+# Enable/disable thank you responses to submission emails.
+#
 respond_to_emails: True
-smtp_server: smtp.gmail.com
-response_text: "Sweet!  Thanks for submitting to Autonomous Interactive Radio.  Your track is queued up and will be played shortly.  Stay tuned..."
+#
+# The outgoing SMTP server. For example, smtp.gmail.com.
+#
+smtp_server: smtp.emailserver.com
+#
+# What would you like your thank you email to say?
+#
+response_text: "Sweet!  Thanks for submitting to Autonomous Interactive Radio.  Your track is queued up and will be played shortly.  Stay tuned..."log_to_file: False
+#
+############################################################################

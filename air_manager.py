@@ -19,17 +19,29 @@ from air_utils import log_it
 ##
 PASSWORD = False
 CONFIG = yaml.load(open("air_download.conf", "r"))
-DIRECTORY = CONFIG["destination_folder"]
+
+try:
+  DIRECTORY = CONFIG["destination_folder"]
+except:
+  DIRECTORY = "/var/lib/mpd/music"
 
 try:
   JINGLE_FREQUENCY = CONFIG["jingle_frequency"]
 except:
   JINGLE_FREQUENCY = 2
 
-JINGLE_DIRECTORY = CONFIG["jingle_folder"]
+try:
+  JINGLE_DIRECTORY = CONFIG["jingle_folder"]
+except:
+  JINGLE_DIRECTORY = "jingles"
+
 HOST = CONFIG["mpd_host"]
 PORT = CONFIG["mpd_port"]
-use_twitter = CONFIG["use_twitter"]
+
+try:
+  use_twitter = CONFIG["use_twitter"]
+except:
+  use_twitter = False
 
 try:
   WAIT_SECONDS = CONFIG["email_interval"]
@@ -37,6 +49,9 @@ except:
   WAIT_SECONDS = 60
 ###
 
+
+def isJingle(filename):
+  return "jingle" in filename
 
 def mpd_connect(host, port, password=None):
   client = MPDClient()
@@ -55,7 +70,7 @@ def mpd_connect(host, port, password=None):
   return client
 
 def jingles_exist(l):
-  jingles = (filter(lambda x: "jingle" in x, l))
+  jingles = (filter(lambda x: isJingle(x), l))
   for jingle in jingles:
     if not os.path.isfile(os.path.join(DIRECTORY, jingle)):
       return False
@@ -66,15 +81,18 @@ def sameList(new, old):
     return False 
 
   for i in range(len(new)):
-    if "jingle" in new[i] and "jingle" in old[i]:
+    if isJingle(new[i]) and isJingle(old[i]):
       continue
     elif not new[i] == old[i]:
       return False
 
   return True
 
-jingles = os.listdir(JINGLE_DIRECTORY)
-shuffle(jingles)
+try:
+  jingles = os.listdir(os.path.join(DIRECTORY, JINGLE_DIRECTORY))
+  shuffle(jingles)
+except:
+  jingles = []
 
 desired_order = sorted([f for f in os.listdir(DIRECTORY) if os.path.isfile(os.path.join(DIRECTORY, f))]) 
 

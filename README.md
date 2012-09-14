@@ -7,9 +7,9 @@ Features
 --------
 
 * Uses [`mpd`](http://en.wikipedia.org/wiki/Music_Player_Daemon) to play music
-* Ability to add jingles!
+* Ability to add jingles between songs!
 * "Now playing" Twitter feed
-* Email response
+* Email response for successful submissions
 
 Debian installation instructions
 --------------------------------
@@ -17,6 +17,11 @@ Debian installation instructions
 1. `apt-get install pip mpd mpc`
 2. `pip install -U -r requirements.txt
 3. `git clone git@github.com:boxysean/airadio.git`
+4. `cp air_download.conf.sample air_download.conf`
+5. Edit `air_download.conf` (suggest making a new email account for this)
+4. `python air_manager.py`
+
+To make this a service on startup, 
 
 Tested on python versions 2.7.1 and 2.7.3
 
