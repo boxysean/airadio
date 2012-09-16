@@ -21,6 +21,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 import time
+import email.header
 
 from air_utils import log_it
 
@@ -77,11 +78,10 @@ def getMsgs(usernm, passwd=None, servername="imap.gmail.com", first=True):
 def getAttachment(msg):
   for part in msg.walk():
     # return only the first attachment...
-    filename = part.get_filename()
-    filename_encoding = part["Content-Transfer-Encoding"]
-    if filename_encoding and filename_encoding == "base64":
-      if filename and "utf-8" in filename:
-        filename = filename[10:-2].decode("base64")
+    filename, filename_encoding = email.header.decode_header(part.get_filename())[0]
+    if filename_encoding:
+      filename = unicode(filename, filename_encoding)
+      filename = filename.encode("ascii", "ignore") # to be nice to file systems
     if part.get_content_type().startswith("audio") or (filename and isAudioFile(filename)):
       return filename, part.get_payload(decode=1)
   return (None, None)
